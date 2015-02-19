@@ -87,3 +87,11 @@ If you want the clock to animate, you still need start it using the .startClock(
       var bouncer = new Clock("bouncer", { movement: "bounce", offset: 10, showSeconds: true });
       bouncer.startClock();
     </script>
+
+
+## 19.02.15 UPGRADE
+
+  Added size option to customize size of clock and added support of absolute offsets (GMT);
+
+* absOffset - If you set to true - 'offset' option work absolutely (by Greenwich). Default 'false' for backward compability
+* size - Now you can customize size of the clock. Sure that "width" and "heigth" attributes are equals to "size" option
