@@ -1,4 +1,4 @@
-function Clock(svgId, offset, minute, second) {
+function Clock(svgId, offset, minute, second, size) {
   "use strict";
 
   // Setup clock face
@@ -11,10 +11,18 @@ function Clock(svgId, offset, minute, second) {
   this.minute = 0;
   this.second = 0;
   this.movement = "normal";
+  this.size = 300;
+
+  this.clockStrokeWidth = 2;
+  this.clockPointsStrokeWidth = 1;
+  this.clockStrokeColor = '#fff';
+  this.clockBackground = "transparent";
+  this.centerSize = 3;
 
   // if offset is an object it'll hold the configuration settings
   if (offset !== null && typeof offset === "object") {
     var options = offset;
+    console.log("options: ", options)
     if ("movement" in options) {
       if (options.movement === "bounce") {
         this.movement = "bounce";
@@ -39,6 +47,9 @@ function Clock(svgId, offset, minute, second) {
     } else {
       this.updateTime();
     }
+    if ("size" in options){
+      this.size = options.size;
+    }
 
   // else use parameters for configuration settings
   } else {
@@ -59,8 +70,12 @@ function Clock(svgId, offset, minute, second) {
     } else {
       this.updateTime();
     }
-  }
 
+    if (size !== undefined){
+      this.size = size;
+    }
+  }
+console.log(this, arguments)
   // Set up clock
   this.drawClockFace();
 }
@@ -71,65 +86,66 @@ Clock.prototype.hideSecondHand = function() {
 };
 
 Clock.prototype.drawClockFace = function() {
-  var clockFace = this.s.circle(150, 150, 100);
+  var clockFace = this.s.circle(this.size/2, this.size/2, this.size/3);
+
   clockFace.attr({
-    fill: "#FFF",
-      stroke: "#000",
-      strokeWidth: 4
+    fill: this.clockBackground,
+      stroke: this.clockStrokeColor,
+      strokeWidth: this.clockStrokeWidth
   });
 
   // Draw hours
   for (var x=1;x<=12;x++) {
-      var hourStroke = this.s.line(150,60,150,80);
+      var hourStroke = this.s.line(this.size/2,this.size/5,this.size/2,4*this.size/15);
       hourStroke.attr({
-        stroke: "#000",
-        strokeWidth: 4
+        stroke: this.clockStrokeColor,
+        strokeWidth: this.clockPointsStrokeWidth
       });
 
       var t = new Snap.Matrix();
-      t.rotate((360/12)*x, 150, 150);
+      t.rotate((360/12)*x, this.size/2, this.size/2);
       hourStroke.transform(t);
   }
 
-  this.hourHand = this.s.line(150,150,150,110);
+  this.hourHand = this.s.line(this.size/2,this.size/2,this.size/2,this.size/3);
   this.hourHand.attr({
-    stroke: "#000",
-    strokeWidth: 4
+    stroke: this.clockStrokeColor,
+    strokeWidth: this.clockStrokeWidth
   });
 
-  this.minuteHand = this.s.line(150,150,150,60);
+  this.minuteHand = this.s.line(this.size/2,this.size/2,this.size/2,this.size/5);
   this.minuteHand.attr({
-    stroke: "#000",
-    strokeWidth: 3
+    stroke: this.clockStrokeColor,
+    strokeWidth: this.clockStrokeWidth
   });
 
   if (this.showSeconds) {
-    this.secondHand = this.s.line(150,150,150,60);
+    this.secondHand = this.s.line(this.size/2,this.size/2,this.size/2,this.size/5);
     this.secondHand.attr({
-      stroke: "#000",
-      strokeWidth: 1
+      stroke: this.clockStrokeColor,
+      strokeWidth: this.clockPointsStrokeWidth
     });
   }
 
   // Centre point
-  var clockCenter = this.s.circle(150, 150, 6);
+  var clockCenter = this.s.circle(this.size/2, this.size/2, this.centerSize);
   clockCenter.attr({
-    fill: "#000"
+    fill: this.clockStrokeColor
   });
 
   // Set initial location of hands
   if (this.showSeconds) {
     var s = new Snap.Matrix();
-    s.rotate(this.getSecondDegree(this.second), 150, 150);
+    s.rotate(this.getSecondDegree(this.second), this.size/2, this.size/2);
     this.secondHand.transform(s);
   }
   
   var h = new Snap.Matrix();
-  h.rotate(this.getHourDegree(this.hour, this.minute), 150, 150);
+  h.rotate(this.getHourDegree(this.hour, this.minute), this.size/2, this.size/2);
   this.hourHand.transform(h);
 
   var m = new Snap.Matrix();
-  m.rotate(this.getMinuteDegree(this.minute), 150, 150);
+  m.rotate(this.getMinuteDegree(this.minute), this.size/2, this.size/2);
   this.minuteHand.transform(m);
 };
 
@@ -160,7 +176,7 @@ Clock.prototype.animateHands = function() {
   // Move second hand
   if (this.showSeconds) {
     var s = new Snap.Matrix();
-    s.rotate(this.getSecondDegree(this.second), 150, 150);
+    s.rotate(this.getSecondDegree(this.second), this.size/2, this.size/2);
     if (this.movement === "bounce") {
       this.secondHand.animate({transform: s}, 400, mina.bounce);
     } else {
@@ -171,7 +187,7 @@ Clock.prototype.animateHands = function() {
   // Move hour & minute?
   if (this.second === 0) {
     var h = new Snap.Matrix();
-    h.rotate(this.getHourDegree(this.hour, this.minute), 150, 150);
+    h.rotate(this.getHourDegree(this.hour, this.minute), this.size/2, this.size/2);
     if (this.movement === "bounce") {
       this.hourHand.animate({transform: h}, 400, mina.bounce);
     } else {
@@ -179,7 +195,7 @@ Clock.prototype.animateHands = function() {
     }
 
     var m = new Snap.Matrix();
-    m.rotate(this.getMinuteDegree(this.minute), 150, 150);
+    m.rotate(this.getMinuteDegree(this.minute), this.size/2, this.size/2);
     if (this.movement === "bounce") {
       this.minuteHand.animate({transform: m}, 400, mina.bounce);
     } else {
