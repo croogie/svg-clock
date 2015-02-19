@@ -1,4 +1,4 @@
-function Clock(svgId, offset, minute, second, size) {
+function Clock(svgId, offset, minute, second, size, absOffset) {
   "use strict";
 
   // Setup clock face
@@ -18,11 +18,12 @@ function Clock(svgId, offset, minute, second, size) {
   this.clockStrokeColor = '#fff';
   this.clockBackground = "transparent";
   this.centerSize = 3;
+  this.absOffset = false;
 
   // if offset is an object it'll hold the configuration settings
   if (offset !== null && typeof offset === "object") {
     var options = offset;
-    console.log("options: ", options)
+    
     if ("movement" in options) {
       if (options.movement === "bounce") {
         this.movement = "bounce";
@@ -33,7 +34,7 @@ function Clock(svgId, offset, minute, second, size) {
     }
     if ("offset" in options) {
       this.offset = options.offset;
-      this.updateTime();
+      
     } else if ("hours" in options || "minutes" in options || "seconds" in options) {
       if ("hours" in options) {
         this.hour = options.hours;
@@ -44,11 +45,13 @@ function Clock(svgId, offset, minute, second, size) {
       if ("seconds" in options) {
         this.second = options.seconds;
       }
-    } else {
-      this.updateTime();
     }
+
     if ("size" in options){
       this.size = options.size;
+    }
+    if ("absOffset" in options){
+      this.absOffset = options.absOffset;
     }
 
   // else use parameters for configuration settings
@@ -66,17 +69,16 @@ function Clock(svgId, offset, minute, second, size) {
     } else if (offset !== undefined) {
       // Set offset
       this.offset = offset;
-      this.updateTime();
-    } else {
-      this.updateTime();
-    }
+      
+    };
 
     if (size !== undefined){
       this.size = size;
     }
   }
-console.log(this, arguments)
+
   // Set up clock
+  this.updateTime();
   this.drawClockFace();
 }
 
@@ -157,6 +159,13 @@ Clock.prototype.updateTime = function() {
   this.hour = now.getHours();
   this.hour += this.offset;
 
+  // Do we have absolute offset?
+  if (this.absOffset) {
+    absOffset = now.getTimezoneOffset()/60;
+    this.hour += absOffset;
+    
+  };
+
   // Normalise hours to 1-12
   if (this.hour > 23) {
     this.hour = this.hour - 24;
@@ -168,6 +177,7 @@ Clock.prototype.updateTime = function() {
   }
   this.minute = now.getMinutes();
   this.second = now.getSeconds();
+
 };
 
 Clock.prototype.animateHands = function() {

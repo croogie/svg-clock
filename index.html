@@ -16,15 +16,15 @@
 <body>
   <h1>SVG Clock examples</h1>
   <div>
-  <svg id="clockUK" width="100" height="100">
+  <svg id="clockUK" width="300" height="300">
   <h2>London (or your local time)</h2>
   </div>
   <div>
-  <svg id="clockUKBounce" width="100" height="100">
+  <svg id="clockUKBounce" width="300" height="300">
   <h2>2 hours ahead with hand bounce</h2>
   </div>
   <div>
-  <svg id="clockNYC" width="100" height="100">
+  <svg id="clockNYC" width="300" height="300">
   <h2>New York (-5)</h2>
   </div>
   <div>
@@ -35,13 +35,13 @@
 
 <script>
   // Start clocks
-  var uk = new Clock("clockUK", {size: 100});
+  var uk = new Clock("clockUK");
   uk.startClock();
 
-  var ukbounce = new Clock("clockUKBounce", { showSeconds: true, offset: 2, movement: "bounce", size: 100 });
+  var ukbounce = new Clock("clockUKBounce", { showSeconds: true, offset: 2, movement: "bounce", size: 300 });
   ukbounce.startClock();
 
-  var nyc = new Clock("clockNYC", {size: 100, offset: -5});
+  var nyc = new Clock("clockNYC", {size: 300, offset: -5, absOffset: true});
   nyc.startClock();
 
   var clock = new Clock("clock", 21, 39, 0, 100);
